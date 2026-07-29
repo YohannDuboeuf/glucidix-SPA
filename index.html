@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Glucidix — un copilote nutrition pour tes longues sorties</title>
+<title>Glucidix — ton copilote nutrition pour tes longues sorties</title>
 <meta name="description" content="Glucidix calcule quoi manger et quand, sur tes sorties trail de plus de 4 h. L'app n'est pas encore sortie : laisse ton email pour être prévenu du lancement.">
 
 <!-- Partage. og:url et og:image DOIVENT être absolues : les scrapers
@@ -13,14 +13,16 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:url" content="https://yohannduboeuf.github.io/glucidix-spa/">
-<meta property="og:title" content="Glucidix — un copilote nutrition pour tes longues sorties">
+<meta property="og:title" content="Glucidix — ton copilote nutrition pour tes longues sorties">
 <meta property="og:description" content="Quoi manger et quand, sur tes sorties trail de plus de 4 h. Laisse ton email pour être prévenu du lancement.">
 <meta property="og:image" content="https://yohannduboeuf.github.io/glucidix-spa/img/fond-paysage-1600.jpg">
 <meta property="og:image:alt" content="Un coureur sur une crête rocheuse au-dessus des nuages">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css">
+<!-- ?v= à incrémenter à chaque modif de la feuille : GitHub Pages sert la
+     CSS avec un cache long, sans ça un visiteur déjà venu garde l'ancienne. -->
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
@@ -59,7 +61,7 @@
   </header>
 
   <section class="hero">
-    <h1 class="hero__title">Un copilote nutrition qui t’évite de te cramer sur les longues sorties</h1>
+    <h1 class="hero__title">Ton copilote nutrition qui t’évite de te cramer sur les longues sorties</h1>
     <p class="hero__sub">L’app n’est pas encore sortie. Laisse ton email, tu sauras quand elle l’est.</p>
 
     <form class="signup" id="signup" novalidate>
@@ -228,22 +230,34 @@ function ring(cx, cy, r, phase, k) {
 const form = document.getElementById('signup');
 const msg = document.getElementById('formmsg');
 
+/* Le bouton reste actif même quand le formulaire est incomplet. Un bouton
+   grisé ne dit pas CE QUI manque : le visiteur cherche, ou part. On laisse
+   cliquer, on nomme le champ fautif et on lui donne le focus. */
+function refuse(message, field) {
+  msg.textContent = message;
+  field.setAttribute('aria-invalid', 'true');
+  field.focus();
+}
+
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  const email = document.getElementById('email').value.trim();
+  const emailField = document.getElementById('email');
+  const consentBox = document.getElementById('consent');
+  const email = emailField.value.trim();
   const platform = form.querySelector('input[name="platform"]:checked');
-  const consent = document.getElementById('consent').checked;
+
+  form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
 
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    msg.textContent = 'Il manque une adresse email valide.';
+    refuse('Il manque une adresse email valide.', emailField);
     return;
   }
   if (!platform) {
-    msg.textContent = 'Choisis Android ou iOS.';
+    refuse('Choisis Android ou iOS.', document.getElementById('pf-android'));
     return;
   }
-  if (!consent) {
-    msg.textContent = 'Coche la case pour qu’on puisse t’écrire.';
+  if (!consentBox.checked) {
+    refuse('Coche la case pour qu’on puisse t’écrire.', consentBox);
     return;
   }
 

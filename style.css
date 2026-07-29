@@ -188,6 +188,10 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
 /* Mobile d'abord : c'est le format principal. Les valeurs de base visent
    360-430px de large, l'élargissement se fait plus bas en min-width. */
 
+/* Halo papier calé sur la colonne de texte : il suit la hauteur réelle du
+   contenu, donc le formulaire reste lisible quelle que soit la fenêtre.
+   Un voile à hauteur fixe ne peut pas tenir cette promesse — sur un écran
+   large et court, le profil remontait sur le bloc de consentement. */
 .wrap {
   position: relative;
   z-index: 1;
@@ -195,6 +199,11 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 22px 20px 32px;
+  background: radial-gradient(160% 72% at 50% 46%,
+    rgba(251,251,248,.97) 0%,
+    rgba(251,251,248,.92) 38%,
+    rgba(251,251,248,.55) 68%,
+    rgba(251,251,248,0) 92%);
 }
 
 .brand {
@@ -328,8 +337,17 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
-.cta:hover { background: var(--accent-deep); }
+/* Le survol n'existe qu'au pointeur. Sans ce garde-fou, un tap sur mobile
+   laisse le bouton bloqué en vert foncé jusqu'au tap suivant. */
+@media (hover: hover) {
+  .cta:hover { background: var(--accent-deep); }
+}
 .cta:active { transform: translateY(1px); }
+
+/* Le champ fautif se signale aussi visuellement : le message seul, posé
+   sous le bouton, se lit mal quand l'erreur porte sur la case à cocher. */
+.field__input[aria-invalid="true"] { border-color: #A33; }
+.consent__box[aria-invalid="true"] { outline: 2px solid #A33; outline-offset: 2px; }
 
 .formmsg { min-height: 1.2em; font-size: 0.8125rem; color: #A33; }
 .formmsg:empty { min-height: 0; }
@@ -388,7 +406,11 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
 
 /* --- Au-delà du téléphone ------------------------------------------------ */
 
-@media (min-width: 600px) {
+/* La hauteur conditionne autant que la largeur : un téléphone en paysage
+   fait 844px de large pour 390 de haut. Sur la seule largeur, il recevait
+   les tailles desktop et le formulaire tombait entièrement sous la ligne
+   de flottaison. */
+@media (min-width: 600px) and (min-height: 620px) {
   .wrap { padding: 40px 20px 48px; }
   .brand { gap: 14px; margin-bottom: 22px; }
   .brand__mark { width: 78px; height: 78px; }
@@ -397,6 +419,47 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   .hero__sub { font-size: 0.9375rem; margin-bottom: 26px; }
   .signup { gap: 14px; }
   .plot { height: 42dvh; }
+}
+
+/* Téléphone en paysage : de la largeur, presque pas de hauteur. Tout se
+   compacte pour ramener le bouton près de la ligne de flottaison. Après le
+   bloc desktop pour gagner sur lui à largeur égale. */
+@media (max-height: 520px) {
+  .wrap { padding: 12px 20px 18px; }
+  .brand { gap: 10px; margin-bottom: 10px; }
+  .brand__mark { width: 42px; height: 42px; }
+  .brand__word { font-size: 1.3rem; }
+  .hero__title { font-size: 1.2rem; margin-bottom: 6px; }
+  .hero__sub { font-size: 0.8125rem; margin-bottom: 14px; }
+  .signup { gap: 10px; }
+  .field__label, .platform__legend { margin-bottom: 4px; }
+  .cta { font-size: 1.0625rem; padding: 11px 18px; }
+  .plot { height: 26dvh; }
+  .foot__inner { padding: 12px 20px 16px; }
+}
+
+/* Paysage assez large : la hauteur manque mais la largeur abonde. Deux
+   colonnes — accroche à gauche, formulaire à droite — et le bouton repasse
+   au-dessus de la ligne de flottaison sans rien rétrécir davantage. */
+@media (min-width: 700px) and (max-height: 520px) {
+  .wrap { max-width: 900px; padding: 14px 24px 18px; }
+
+  .brand { justify-content: flex-start; margin-bottom: 12px; }
+
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "titre form"
+      "sous  form";
+    column-gap: 32px;
+    align-items: start;
+  }
+  .hero__title { grid-area: titre; text-align: left; font-size: 1.5rem; }
+  .hero__sub { grid-area: sous; text-align: left; font-size: 0.875rem; }
+  .signup,
+  .confirm { grid-area: form; }
 }
 
 @media (prefers-reduced-motion: reduce) {
