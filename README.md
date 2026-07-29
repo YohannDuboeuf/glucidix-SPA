@@ -29,15 +29,21 @@ code** : aucune image, aucun tracé SVG écrit à la main.
 
 ## Brevo
 
-Le formulaire poste vers l'endpoint Brevo de la liste `waiting list`, en
-double opt-in. Champs envoyés : `EMAIL`, `PLATEFORME` (`Android` / `iOS`),
+Le formulaire poste vers l'endpoint Brevo de la liste `waiting list`.
+Champs envoyés : `EMAIL`, `PLATEFORME` (`Android` / `iOS`),
 `email_address_check` (piège à robots, doit rester vide), `locale`.
+
+**Simple opt-in.** Le double opt-in de Brevo passe par une automation, hors
+du plan actuel : aucun email de confirmation ne part. Le consentement repose
+donc sur la case à cocher — décochée par défaut, formulée en clair. Ni
+l'écran de confirmation ni les mentions légales ne doivent parler d'un
+« lien de confirmation ». Si le plan change et que le double opt-in est
+activé, les deux textes sont à reprendre.
 
 La soumission vise une **iframe cachée** : un POST classique ferait quitter
 la page vers l'écran de remerciement de Brevo. Conséquence assumée — la
-réponse n'est pas lisible (pas de CORS sur `sibforms.com`), donc la
-confirmation est optimiste. Sans risque : la vraie confirmation est le lien
-reçu par email, et le message à l'écran le dit.
+réponse n'est pas lisible (pas de CORS sur `sibforms.com`), donc l'écran de
+confirmation s'affiche sans preuve que Brevo a bien accepté.
 
 Les champs `platform` et `consent` sont désactivés juste avant l'envoi :
 ils ne servent qu'au navigateur, Brevo ne les attend pas.
