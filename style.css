@@ -1,6 +1,7 @@
 /* ==========================================================================
-   Glucidix — landing statique (GX-34-1)
-   Zéro dépendance, zéro requête sortante. Police locale dans fonts/.
+   Glucidix — page de liste d'attente
+   Fond carte + profil, généré en code. Aucune image, aucune requête
+   sortante au chargement. Police locale dans fonts/.
    ========================================================================== */
 
 @font-face {
@@ -12,58 +13,43 @@
 }
 
 :root {
-  /* Palette — valeurs figées, ne pas dévier */
-  --bg: #FFFFFF;
-  --surface-warm: #F5F6F5;
-  --surface-sunken: #EFF1EF;
-  --line: rgba(60, 40, 20, 0.06);
-  --line-strong: rgba(60, 40, 20, 0.12);
+  --paper: #FBFBF8;
+  --surface: #F2F3F0;
+  --line: rgba(56, 80, 58, 0.14);
   --ink: #2A2520;
   --ink-mute: #6B6157;
   --ink-faint: #9A9085;
   --accent: #6F9E6C;
   --accent-deep: #38503A;
-  --accent-soft: #D6E7D2;
-  --accent-wash: #EDF4EA;
-
-  /* Rythme */
-  --r-sm: 8px;
   --r-md: 12px;
-  --r-lg: 16px;
-  --gut: 20px;
-  --maxw: 560px;
   --tap: 48px;
-
+  --maxw: 560px;
   --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
           Roboto, "Helvetica Neue", Arial, sans-serif;
 }
-
-/* --- Reset minimal ------------------------------------------------------- */
 
 *, *::before, *::after { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
 
 body {
+  position: relative;
   margin: 0;
-  background: var(--bg);
+  min-height: 100dvh;
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--font);
   font-size: 16px;
   line-height: 1.45;
-  font-weight: 400;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, p, ul, fieldset, legend { margin: 0; padding: 0; }
 ul { list-style: none; }
 fieldset { border: 0; min-width: 0; }
 
-a {
-  color: var(--accent-deep);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
+a { color: var(--accent-deep); text-underline-offset: 2px; }
 
 :focus-visible {
   outline: 2px solid var(--accent-deep);
@@ -71,56 +57,184 @@ a {
   border-radius: 4px;
 }
 
-/* --- Layout -------------------------------------------------------------- */
+/* --- Fond : carte topographique + profil D+ ------------------------------ */
+
+/* Squelette : la scène (fond + formulaire) prend la hauteur disponible, le
+   pied est poussé tout en bas. Le fond est borné à la scène — il s'arrête
+   donc net au-dessus du pied, qui reste sur blanc opaque. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* Contenu ancré en haut, pas centré : centré verticalement, il descend dans
+   la bande du profil et le tracé repasse sur le formulaire. */
+.stage {
+  position: relative;
+  flex: 1 0 auto;
+}
+
+/* Ancré à la scène, pas au viewport : en `fixed`, le profil reste collé au
+   bas de l'écran et traverse le formulaire dès que la page dépasse la
+   hauteur visible — le cas normal sur un téléphone court. */
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.map { position: absolute; inset: 0; background: var(--paper); }
+
+.map .quad {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(111,158,108,.16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(111,158,108,.16) 1px, transparent 1px),
+    linear-gradient(to right, rgba(111,158,108,.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(111,158,108,.07) 1px, transparent 1px);
+  background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
+}
+
+.map svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.map .iso { fill: none; stroke: rgba(56,80,58,.24); stroke-width: 1; }
+.map .iso--master { stroke: rgba(56,80,58,.4); stroke-width: 1.6; }
+
+.map .grain {
+  position: absolute; inset: 0;
+  opacity: .22; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+/* Voile de lisibilité centré sur la colonne de texte, pas sur le haut de
+   page : centré haut, il délave la bande du logo et la carte semble ne
+   commencer qu'à mi-écran. */
+.map .clear {
+  position: absolute; inset: 0;
+  background: radial-gradient(120% 52% at 50% 38%,
+    rgba(251,251,248,.94) 0%,
+    rgba(251,251,248,.86) 42%,
+    rgba(251,251,248,.46) 68%,
+    rgba(251,251,248,0) 84%);
+}
+
+/* Le tracé est étiré en largeur (preserveAspectRatio="none"). Tout <text>
+   placé dedans subirait la même déformation et sortirait aplati : les prises
+   sont donc du HTML positionné en %, au-dessus du SVG.
+   Le fondu est un MASQUE sur le dessin, pas un voile posé par-dessus — un
+   aplat effacerait le carroyage sur son emprise et créerait une démarcation
+   horizontale nette entre la carte et le profil.
+   `dvh` et pas `vh` : sur mobile, `vh` vaut la hauteur SANS la barre d'URL,
+   donc le profil remontait dans le formulaire tant que la barre est là. */
+.plot {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 30dvh;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,.3) 30%, #000 62%);
+  mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,.3) 30%, #000 62%);
+}
+.plot svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.plot .pins { position: absolute; inset: 0; }
+
+.plot .trace {
+  fill: none;
+  stroke: var(--accent-deep);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  animation: draw 4.2s cubic-bezier(.5,.1,.2,1) forwards;
+  opacity: .72;
+}
+.plot .area { opacity: 0; animation: fadein 2.4s ease 1.4s forwards; }
+
+.pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: pinpop .5s cubic-bezier(.2,1.4,.4,1) forwards;
+}
+.pin .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent-deep); }
+.pin .halo {
+  position: absolute; left: 50%; top: 50%;
+  width: 14px; height: 14px; margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  animation: halo 2.8s ease-out infinite;
+}
+.pin .lab {
+  position: absolute; left: 50%; bottom: 15px;
+  transform: translateX(-50%);
+  font: 700 11px/1 var(--font);
+  color: var(--ink-mute);
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fadein { to { opacity: 1; } }
+@keyframes pinpop { to { opacity: 1; } }
+@keyframes halo {
+  0%   { transform: scale(1);   opacity: .55; }
+  70%  { transform: scale(3.2); opacity: 0; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+/* --- Colonne ------------------------------------------------------------- */
+
+/* Mobile d'abord : c'est le format principal. Les valeurs de base visent
+   360-430px de large, l'élargissement se fait plus bas en min-width. */
 
 .wrap {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 18px var(--gut) 40px;
+  padding: 22px 20px 32px;
 }
-
-/* --- Marque -------------------------------------------------------------- */
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
-
-.brand__mark {
-  width: 48px;
-  height: 48px;
-  flex: 0 0 auto;
-  display: block;
-}
-
+.brand__mark { width: 60px; height: 60px; flex: 0 0 auto; display: block; }
 .brand__word {
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-}
-
-/* --- Hero ---------------------------------------------------------------- */
-
-.hero__title {
-  font-size: 1.6rem;
-  line-height: 1.2;
+  font-size: 1.75rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin-bottom: 18px;
+}
+
+.hero__title {
+  font-size: 1.5rem;
+  line-height: 1.18;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-wrap: balance;
+  margin-bottom: 8px;
+}
+
+.hero__sub {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--ink-mute);
+  margin-bottom: 20px;
   text-wrap: balance;
 }
 
 /* --- Formulaire ---------------------------------------------------------- */
 
-.signup {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+.signup { display: flex; flex-direction: column; gap: 12px; }
+/* `display: flex` gagne contre la règle UA `[hidden] { display: none }` :
+   sans ça, form.hidden = true ne masque rien. */
+.signup[hidden] { display: none; }
 
 .field__label,
 .platform__legend {
@@ -137,34 +251,20 @@ a {
   padding: 12px 14px;
   font: inherit;
   color: var(--ink);
-  background: var(--surface-warm);
-  border: 1px solid var(--line-strong);
+  background: rgba(255,255,255,.72);
+  border: 1px solid var(--line);
   border-radius: var(--r-md);
 }
-
 .field__input::placeholder { color: var(--ink-faint); }
+.field__input:focus-visible { border-color: var(--accent); background: #fff; }
 
-.field__input:focus-visible {
-  border-color: var(--accent);
-  background: var(--bg);
-}
-
-/* Segments plateforme (radios natifs masqués, labels stylés) */
-
-.segments {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+.segments { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 .segments__radio {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
   overflow: hidden;
-  clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
@@ -178,51 +278,26 @@ a {
   padding: 10px 12px;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--ink);
-  background: var(--surface-warm);
-  border: 1px solid var(--line-strong);
+  background: rgba(255,255,255,.72);
+  border: 1px solid var(--line);
   border-radius: var(--r-md);
   cursor: pointer;
   user-select: none;
 }
-
 .segments__radio:checked + .segments__label {
-  background: var(--accent-wash);
-  border-color: var(--accent-soft);
-  box-shadow: inset 0 0 0 1px var(--accent-soft);
+  background: #EDF4EA;
+  border-color: #D6E7D2;
+  box-shadow: inset 0 0 0 1px #D6E7D2;
 }
-
 .segments__radio:focus-visible + .segments__label {
   outline: 2px solid var(--accent-deep);
   outline-offset: 2px;
 }
 
-/* Consentement */
-
-/* Rangée à 44px mini : la cible tactile réelle est le <label> associé
-   (for="consent"), qui occupe la largeur restante sur toute la hauteur.
-   La case elle-même est à 24px = minimum WCAG 2.5.8 (AA).
-   Ne pas repasser la case sous 24px. */
-
-.consent {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: var(--tap);
-  padding: 0;
-}
-
-.consent__box {
-  flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
-  margin: 0;
-  accent-color: var(--accent-deep);
-}
-
-/* Le <span> interne est INDISPENSABLE : sans lui, le texte et le lien
-   deviennent deux items flex distincts et le lien se détache à droite. */
-
+/* La case fait 24px (minimum WCAG 2.5.8) ; la cible tactile réelle est le
+   label associé, qui occupe la largeur restante sur toute la hauteur. */
+.consent { display: flex; align-items: center; gap: 10px; min-height: var(--tap); }
+.consent__box { flex: 0 0 auto; width: 24px; height: 24px; margin: 0; accent-color: var(--accent-deep); }
 .consent__label {
   flex: 1 1 auto;
   display: flex;
@@ -235,224 +310,98 @@ a {
   cursor: pointer;
 }
 
-/* CTA */
-
+/* 19px/800 = "texte large" au sens WCAG : blanc sur --accent donne 3,10:1,
+   conforme AA à ce titre. Ne pas descendre sous 1.1875rem ni sous 800. */
 .cta {
   width: 100%;
   min-height: var(--tap);
   padding: 13px 18px;
   font: inherit;
-  /* 19px/800 = "texte large" WCAG (seuil 14pt gras) : blanc sur --accent
-     donne 3,10:1, conforme AA à ce titre, et identique à l'app
-     (Theme.kt : primary = AccentSage, onPrimary = Color.White).
-     Ne pas descendre sous 1.1875rem ni sous 800 : le texte repasserait
-     en "normal" où le seuil est 4,5:1 et le blanc échouerait. */
   font-size: 1.1875rem;
   font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: var(--bg);
+  color: #fff;
   background: var(--accent);
   border: 0;
   border-radius: var(--r-md);
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
-
-.cta:hover { background: var(--accent-deep); color: var(--bg); }
+.cta:hover { background: var(--accent-deep); }
 .cta:active { transform: translateY(1px); }
 
-/* Zone de message (erreur / statut) — pilotée plus tard */
-
-.formmsg {
-  min-height: 1.2em;
-  font-size: 0.8125rem;
-  color: var(--ink-mute);
-}
-
+.formmsg { min-height: 1.2em; font-size: 0.8125rem; color: #A33; }
 .formmsg:empty { min-height: 0; }
-
-/* Bloc de confirmation — masqué par défaut, remplacera le formulaire */
 
 .confirm {
   padding: 18px;
-  background: var(--accent-wash);
-  border: 1px solid var(--accent-soft);
-  border-radius: var(--r-lg);
+  background: #EDF4EA;
+  border: 1px solid #D6E7D2;
+  border-radius: 16px;
 }
+.confirm__text { font-size: 0.9375rem; font-weight: 600; }
+.confirm__note { margin-top: 8px; font-size: 0.8125rem; font-weight: 400; color: var(--ink-mute); }
 
-.confirm__text {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--ink);
-}
+/* --- Pied + mentions ----------------------------------------------------- */
 
-/* --- Bénéfices ----------------------------------------------------------- */
-
-.benefits {
-  margin-top: 40px;
-  padding-top: 28px;
-  border-top: 1px solid var(--line);
-}
-
-.benefits__title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-mute);
-  margin-bottom: 16px;
-}
-
-.benefits__list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.benefit {
-  padding: 14px 16px;
-  background: var(--surface-sunken);
-  border-radius: var(--r-md);
-}
-
-.benefit__title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.benefit__text {
-  font-size: 0.875rem;
-  color: var(--ink-mute);
-}
-
-/* --- Pied de page -------------------------------------------------------- */
-
+/* Bandeau plein blanc, hors de la scène : les mentions ne sont plus posées
+   en transparence sur le dessin. */
 .foot {
-  margin-top: 32px;
-  padding-top: 16px;
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  background: #fff;
   border-top: 1px solid var(--line);
-}
-
-.foot__line {
   font-size: 0.8125rem;
   color: var(--ink-mute);
 }
 
-/* --- Écrans plus larges (page de conversion, on ne s'étale pas) ---------- */
+.foot__inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 18px 20px 24px;
+}
+
+.foot__toggle {
+  font: inherit;
+  color: var(--accent-deep);
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.legal { margin-top: 24px; }
+.legal[hidden] { display: none; }
+
+.legal__title { font-size: 1.125rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 2px; }
+.legal__date { font-size: 0.8125rem; color: var(--ink-faint); margin-bottom: 18px; }
+.legal h3 { font-size: 0.9375rem; font-weight: 800; margin: 20px 0 6px; }
+.legal p { font-size: 0.875rem; line-height: 1.6; color: var(--ink-mute); margin-bottom: 10px; }
+.legal strong { color: var(--ink); font-weight: 600; }
+.legal .nolink { color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+
+.foot__mock { margin-top: 4px; font-size: 0.75rem; color: var(--ink-faint); }
+
+/* --- Au-delà du téléphone ------------------------------------------------ */
 
 @media (min-width: 600px) {
-  .wrap { padding-top: 48px; padding-bottom: 56px; }
-  .hero__title { font-size: 2rem; }
-  .benefits__list {
-    flex-direction: row;
-    gap: 10px;
-  }
-  .benefit { flex: 1 1 0; }
+  .wrap { padding: 40px 20px 48px; }
+  .brand { gap: 14px; margin-bottom: 22px; }
+  .brand__mark { width: 78px; height: 78px; }
+  .brand__word { font-size: 2.15rem; }
+  .hero__title { font-size: 2rem; line-height: 1.2; margin-bottom: 10px; }
+  .hero__sub { font-size: 0.9375rem; margin-bottom: 26px; }
+  .signup { gap: 14px; }
+  .plot { height: 42dvh; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .plot .trace { animation: none; stroke-dashoffset: 0; }
+  .plot .area, .pin { animation: none; opacity: 1; }
+  .pin .halo { animation: none; }
   .cta:active { transform: none; }
-}
-
-/* ── Page document (legal.html) ─────────────────────────────────────
-   Même colonne que la landing. Aucun style inline, aucune ressource
-   externe : la page légale respecte les mêmes invariants que index.html
-   (0 requête sortante, 0 cookie), sinon elle contredirait son contenu. */
-
-.doc {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 24px 20px 56px;
-}
-
-.doc__back {
-  margin: 0 0 20px;
-  font-size: 0.875rem;
-}
-
-.doc__back a {
-  color: var(--accent-deep);
-}
-
-.doc__title {
-  margin: 0 0 4px;
-  font-size: 1.5rem;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-}
-
-.doc__date {
-  margin: 0 0 20px;
-  font-size: 0.8125rem;
-  color: var(--ink-faint);
-}
-
-.doc__intro {
-  margin: 0 0 28px;
-  padding: 14px 16px;
-  font-size: 0.9375rem;
-  line-height: 1.55;
-  color: var(--ink-mute);
-  background: var(--accent-wash);
-  border-radius: var(--r-md);
-}
-
-.doc h2 {
-  margin: 32px 0 10px;
-  font-size: 1.0625rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-}
-
-.doc h3 {
-  margin: 20px 0 8px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.doc p,
-.doc li {
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--ink-mute);
-}
-
-.doc p {
-  margin: 0 0 12px;
-}
-
-.doc ul {
-  margin: 0 0 12px;
-  padding-left: 20px;
-}
-
-.doc li {
-  margin-bottom: 6px;
-}
-
-.doc strong {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.doc a {
-  color: var(--accent-deep);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-/* Adresse citée en texte, volontairement pas cliquable : un lien
-   sortant serait une requête vers un tiers au clic, et la page
-   affirme n'en faire aucune. */
-
-.doc__nolink {
-  color: var(--ink);
-  font-weight: 600;
-  overflow-wrap: anywhere;
 }

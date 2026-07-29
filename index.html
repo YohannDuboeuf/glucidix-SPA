@@ -3,15 +3,42 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Glucidix — copilote nutrition trail</title>
-<meta name="description" content="Glucidix calcule quoi manger et quand, sur tes sorties trail de plus de 4 h. Laisse ton email pour être prévenu du lancement.">
-<meta property="og:title" content="Glucidix — copilote nutrition trail">
-<meta property="og:description" content="Glucidix calcule quoi manger et quand, sur tes sorties trail de plus de 4 h. Laisse ton email pour être prévenu du lancement.">
+<title>Glucidix — un copilote nutrition pour tes longues sorties</title>
+<meta name="description" content="Glucidix calcule quoi manger et quand, sur tes sorties trail de plus de 4 h. L'app n'est pas encore sortie : laisse ton email pour être prévenu du lancement.">
+
+<!-- Partage. og:url et og:image DOIVENT être absolues : les scrapers
+     (WhatsApp, LinkedIn, Slack) ne résolvent pas les chemins relatifs et
+     affichent le lien sans vignette. À mettre à jour si le repo est renommé
+     ou si un nom de domaine arrive. -->
 <meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://yohannduboeuf.github.io/glucidix-spa/">
+<meta property="og:title" content="Glucidix — un copilote nutrition pour tes longues sorties">
+<meta property="og:description" content="Quoi manger et quand, sur tes sorties trail de plus de 4 h. Laisse ton email pour être prévenu du lancement.">
+<meta property="og:image" content="https://yohannduboeuf.github.io/glucidix-spa/img/fond-paysage-1600.jpg">
+<meta property="og:image:alt" content="Un coureur sur une crête rocheuse au-dessus des nuages">
+<meta name="twitter:card" content="summary_large_image">
+
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<div class="page">
+<div class="stage">
+
+<div class="bg" aria-hidden="true">
+  <div class="map">
+    <div class="quad"></div>
+    <svg id="iso" viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice"></svg>
+    <div class="grain"></div>
+    <div class="clear"></div>
+  </div>
+  <div class="plot">
+    <svg id="profil" viewBox="0 0 1200 420" preserveAspectRatio="none"></svg>
+    <div class="pins" id="pins"></div>
+  </div>
+</div>
 
 <main class="wrap">
 
@@ -33,6 +60,7 @@
 
   <section class="hero">
     <h1 class="hero__title">Un copilote nutrition qui t’évite de te cramer sur les longues sorties</h1>
+    <p class="hero__sub">L’app n’est pas encore sortie. Laisse ton email, tu sauras quand elle l’est.</p>
 
     <form class="signup" id="signup" novalidate>
 
@@ -55,7 +83,7 @@
 
       <div class="consent">
         <input class="consent__box" type="checkbox" id="consent" name="consent" required>
-        <label class="consent__label" for="consent"><span>J’accepte de recevoir des nouvelles de Glucidix par email : l’avancement et la sortie de l’app. Pas de publicité, désinscription en un clic. <a href="legal.html">Détail</a></span></label>
+        <label class="consent__label" for="consent"><span>J’accepte de recevoir par email l’avancement et la sortie de Glucidix. Pas de publicité, désinscription en un clic.</span></label>
       </div>
 
       <button class="cta" type="submit">Préviens-moi au lancement</button>
@@ -64,32 +92,177 @@
     </form>
 
     <div class="confirm" id="confirm" hidden>
-      <p class="confirm__text">C’est noté. Ouvre ta boîte mail et clique le lien de confirmation — sans ça tu ne seras pas inscrit.</p>
+      <p class="confirm__text">C’est noté.</p>
+      <p class="confirm__note">Maquette : rien n’a été envoyé, ton email n’est enregistré nulle part.</p>
     </div>
   </section>
 
-  <section class="benefits" aria-label="Ce que fait Glucidix">
-    <ul class="benefits__list">
-      <li class="benefit">
-        <h2 class="benefit__title">Un plan chiffré, pas des conseils vagues</h2>
-        <p class="benefit__text">Combien de glucides, à quel moment, selon ta sortie et ton profil.</p>
-      </li>
-      <li class="benefit">
-        <h2 class="benefit__title">Prévenu sur ta montre</h2>
-        <p class="benefit__text">Une notif quand c’est l’heure. Ton téléphone reste dans le sac.</p>
-      </li>
-      <li class="benefit">
-        <h2 class="benefit__title">S’affine sortie après sortie</h2>
-        <p class="benefit__text">Ce que tu as pris, ce qui est passé : le plan suivant en tient compte.</p>
-      </li>
-    </ul>
-  </section>
-
-  <footer class="foot">
-    <p class="foot__line">Glucidix · <a href="legal.html">Mentions légales</a></p>
-  </footer>
-
 </main>
+
+</div><!-- /.stage -->
+
+<footer class="foot">
+  <div class="foot__inner">
+    <p>Glucidix · <button class="foot__toggle" id="legal-toggle" type="button" aria-expanded="false" aria-controls="legal">Mentions légales</button></p>
+    <p class="foot__mock">Maquette de présentation — le formulaire n’enregistre rien.</p>
+
+    <!-- Volume réduit au strict nécessaire. Les items conservés sont ceux
+         qu'une collecte d'email au consentement impose : identité + contact,
+         hébergeur, données, finalité, base légale, retrait, sous-traitant,
+         durée, droits, CNIL. Enlever l'un d'eux, ce n'est plus "faire moins",
+         c'est être hors des clous. -->
+    <section class="legal" id="legal" hidden>
+      <h2 class="legal__title">Mentions légales et confidentialité</h2>
+      <p class="legal__date">Version du 29 juillet 2026</p>
+
+      <p>Éditeur : <strong>Yohann Duboeuf</strong>, particulier — <strong>glucidix@gmail.com</strong>. Hébergement : GitHub Pages (GitHub, Inc., San Francisco, États-Unis).</p>
+
+      <p>On garde <strong>ton email</strong> et <strong>ta plateforme</strong>, rien d’autre, pour te prévenir de la sortie de l’app et te donner l’avancement d’ici là. Base : ton <strong>consentement</strong> — la case cochée, puis le lien de confirmation dans l’email. Tu peux le retirer quand tu veux : lien de désinscription dans chaque email, ou un mot à <strong>glucidix@gmail.com</strong>.</p>
+
+      <p>La liste est hébergée par <strong>Brevo</strong> (société française, données en Union européenne). Ton email n’est ni vendu, ni loué, ni transmis. Il est supprimé <strong>3 mois</strong> après le message de lancement, ou au bout de <strong>2 ans</strong> si l’app ne sort pas.</p>
+
+      <p>Accès, correction, effacement de tes données : <strong>glucidix@gmail.com</strong>. En cas de désaccord, tu peux saisir la CNIL (<span class="nolink">cnil.fr</span>).</p>
+    </section>
+  </div>
+</footer>
+
+</div><!-- /.page -->
+
+<script>
+/* ---- Fond généré ---------------------------------------------------------
+   Carte (courbes de niveau) + profil D+ avec les prises posées dessus.
+   Tout est calculé ici : aucune image, aucun path SVG écrit à la main. */
+
+// Catmull-Rom -> Bézier cubique.
+function smooth(pts, tension) {
+  const t = tension === undefined ? 1 : tension;
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] || p2;
+    d += ` C${(p1[0] + (p2[0] - p0[0]) / 6 * t).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) / 6 * t).toFixed(1)}`
+       + ` ${(p2[0] - (p3[0] - p1[0]) / 6 * t).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) / 6 * t).toFixed(1)}`
+       + ` ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+
+// Courbe de niveau : cercle déformé par une somme de sinus.
+function ring(cx, cy, r, phase, k) {
+  const pts = [];
+  for (let i = 0; i <= 96; i++) {
+    const a = i / 96 * Math.PI * 2;
+    const rr = r * (1
+      + 0.16 * Math.sin(3 * a + phase)
+      + 0.09 * Math.sin(5 * a - phase * 1.6)
+      + 0.05 * Math.sin(8 * a + phase * .7)
+      + 0.03 * Math.sin(13 * a - k));
+    pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.72]);
+  }
+  return smooth(pts) + ' Z';
+}
+
+// Deux massifs, décalés vers les bords : le centre reste au texte.
+(function drawMap() {
+  let out = '';
+  for (let i = 0; i < 9; i++) {
+    out += `<path class="iso${i % 4 === 0 ? ' iso--master' : ''}" d="${ring(190, 250, 58 + i * 36, 0.9 + i * .18, i)}"/>`;
+  }
+  for (let i = 0; i < 8; i++) {
+    out += `<path class="iso${i % 4 === 0 ? ' iso--master' : ''}" d="${ring(1030, 380, 52 + i * 38, 2.6 + i * .21, i)}"/>`;
+  }
+  document.getElementById('iso').innerHTML = out;
+})();
+
+(function drawProfil() {
+  const W = 1200, H = 420;
+  const elev = [.10,.26,.19,.44,.36,.62,.50,.58,.82,.66,.90,.72,.44,.26,.12];
+  const pts = elev.map((e, i) => [i * (W / (elev.length - 1)), H - 26 - e * (H - 90)]);
+  const d = smooth(pts);
+
+  document.getElementById('profil').innerHTML = `
+    <defs>
+      <linearGradient id="gx-area" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#6F9E6C" stop-opacity=".22"/>
+        <stop offset="100%" stop-color="#6F9E6C" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path class="area" d="${d} L${W},${H} L0,${H} Z" fill="url(#gx-area)"/>
+    <path class="trace" id="trace" d="${d}"/>`;
+
+  const path = document.getElementById('trace');
+  const pins = document.getElementById('pins');
+  const L = path.getTotalLength();
+  path.style.setProperty('--len', L);
+
+  const stops = [
+    { t: .13, label: '+40' },
+    { t: .32, label: '+1 h 20' },
+    { t: .52, label: '+2 h' },
+    { t: .71, label: '+2 h 40' },
+    { t: .88, label: '+3 h 20' }
+  ];
+
+  stops.forEach((s) => {
+    // Point lu sur la courbe, converti en % de la boîte : le SVG est étiré
+    // linéairement, le % retombe donc exactement sur le point.
+    const p = path.getPointAtLength(L * s.t);
+    const g = document.createElement('div');
+    g.className = 'pin';
+    g.style.left = (p.x / W * 100).toFixed(2) + '%';
+    g.style.top = (p.y / H * 100).toFixed(2) + '%';
+    // Le tracé met 4,2 s : chaque prise apparaît quand la ligne l'atteint.
+    g.style.animationDelay = (0.35 + s.t * 4.0) + 's';
+    g.innerHTML =
+      `<div class="halo" style="animation-delay:${(0.5 + s.t * 4.0).toFixed(2)}s"></div>` +
+      `<div class="dot"></div>` +
+      `<div class="lab">${s.label}</div>`;
+    pins.appendChild(g);
+  });
+})();
+
+/* ---- Formulaire (maquette : rien n'est envoyé) --------------------------- */
+
+const form = document.getElementById('signup');
+const msg = document.getElementById('formmsg');
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const platform = form.querySelector('input[name="platform"]:checked');
+  const consent = document.getElementById('consent').checked;
+
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    msg.textContent = 'Il manque une adresse email valide.';
+    return;
+  }
+  if (!platform) {
+    msg.textContent = 'Choisis Android ou iOS.';
+    return;
+  }
+  if (!consent) {
+    msg.textContent = 'Coche la case pour qu’on puisse t’écrire.';
+    return;
+  }
+
+  msg.textContent = '';
+  form.hidden = true;
+  document.getElementById('confirm').hidden = false;
+});
+
+/* ---- Mentions légales dépliables ---------------------------------------- */
+
+const toggle = document.getElementById('legal-toggle');
+const legal = document.getElementById('legal');
+
+toggle.addEventListener('click', () => {
+  const open = legal.hidden;
+  legal.hidden = !open;
+  toggle.setAttribute('aria-expanded', String(open));
+});
+</script>
 
 </body>
 </html>
