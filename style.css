@@ -169,6 +169,10 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   border: 2px solid var(--accent);
   animation: halo 2.8s ease-out infinite;
 }
+/* Halo papier autour du label. Le SVG est étiré différemment à chaque
+   largeur : impossible de garantir qu'aucun label ne tombe sur la courbe en
+   jouant seulement sur l'écart vertical. Le halo règle le cas par principe,
+   et c'est le traitement des cartes — le texte masque la ligne. */
 .pin .lab {
   position: absolute; left: 50%; bottom: 22px;
   transform: translateX(-50%);
@@ -176,6 +180,9 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   color: var(--ink-mute);
   letter-spacing: .02em;
   white-space: nowrap;
+  text-shadow:
+    0 0 4px var(--paper), 0 0 4px var(--paper),
+    0 0 9px var(--paper), 0 0 9px var(--paper);
 }
 
 @keyframes draw { to { stroke-dashoffset: 0; } }
