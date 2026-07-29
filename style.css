@@ -1,0 +1,458 @@
+/* ==========================================================================
+   Glucidix — landing statique (GX-34-1)
+   Zéro dépendance, zéro requête sortante. Police locale dans fonts/.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("fonts/plus-jakarta-sans-latin-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Palette — valeurs figées, ne pas dévier */
+  --bg: #FFFFFF;
+  --surface-warm: #F5F6F5;
+  --surface-sunken: #EFF1EF;
+  --line: rgba(60, 40, 20, 0.06);
+  --line-strong: rgba(60, 40, 20, 0.12);
+  --ink: #2A2520;
+  --ink-mute: #6B6157;
+  --ink-faint: #9A9085;
+  --accent: #6F9E6C;
+  --accent-deep: #38503A;
+  --accent-soft: #D6E7D2;
+  --accent-wash: #EDF4EA;
+
+  /* Rythme */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --gut: 20px;
+  --maxw: 560px;
+  --tap: 48px;
+
+  --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* --- Reset minimal ------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p, ul, fieldset, legend { margin: 0; padding: 0; }
+ul { list-style: none; }
+fieldset { border: 0; min-width: 0; }
+
+a {
+  color: var(--accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-deep);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* --- Layout -------------------------------------------------------------- */
+
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 18px var(--gut) 40px;
+}
+
+/* --- Marque -------------------------------------------------------------- */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.brand__mark {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: block;
+}
+
+.brand__word {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* --- Hero ---------------------------------------------------------------- */
+
+.hero__title {
+  font-size: 1.6rem;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+  text-wrap: balance;
+}
+
+/* --- Formulaire ---------------------------------------------------------- */
+
+.signup {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field__label,
+.platform__legend {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-mute);
+  margin-bottom: 6px;
+}
+
+.field__input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface-warm);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+}
+
+.field__input::placeholder { color: var(--ink-faint); }
+
+.field__input:focus-visible {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+
+/* Segments plateforme (radios natifs masqués, labels stylés) */
+
+.segments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.segments__radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.segments__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  padding: 10px 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface-warm);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  user-select: none;
+}
+
+.segments__radio:checked + .segments__label {
+  background: var(--accent-wash);
+  border-color: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent-soft);
+}
+
+.segments__radio:focus-visible + .segments__label {
+  outline: 2px solid var(--accent-deep);
+  outline-offset: 2px;
+}
+
+/* Consentement */
+
+/* Rangée à 44px mini : la cible tactile réelle est le <label> associé
+   (for="consent"), qui occupe la largeur restante sur toute la hauteur.
+   La case elle-même est à 24px = minimum WCAG 2.5.8 (AA).
+   Ne pas repasser la case sous 24px. */
+
+.consent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap);
+  padding: 0;
+}
+
+.consent__box {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  accent-color: var(--accent-deep);
+}
+
+/* Le <span> interne est INDISPENSABLE : sans lui, le texte et le lien
+   deviennent deux items flex distincts et le lien se détache à droite. */
+
+.consent__label {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 4px 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink-mute);
+  cursor: pointer;
+}
+
+/* CTA */
+
+.cta {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 13px 18px;
+  font: inherit;
+  /* 19px/800 = "texte large" WCAG (seuil 14pt gras) : blanc sur --accent
+     donne 3,10:1, conforme AA à ce titre, et identique à l'app
+     (Theme.kt : primary = AccentSage, onPrimary = Color.White).
+     Ne pas descendre sous 1.1875rem ni sous 800 : le texte repasserait
+     en "normal" où le seuil est 4,5:1 et le blanc échouerait. */
+  font-size: 1.1875rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--bg);
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.cta:hover { background: var(--accent-deep); color: var(--bg); }
+.cta:active { transform: translateY(1px); }
+
+/* Zone de message (erreur / statut) — pilotée plus tard */
+
+.formmsg {
+  min-height: 1.2em;
+  font-size: 0.8125rem;
+  color: var(--ink-mute);
+}
+
+.formmsg:empty { min-height: 0; }
+
+/* Bloc de confirmation — masqué par défaut, remplacera le formulaire */
+
+.confirm {
+  padding: 18px;
+  background: var(--accent-wash);
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--r-lg);
+}
+
+.confirm__text {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* --- Bénéfices ----------------------------------------------------------- */
+
+.benefits {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.benefits__title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 16px;
+}
+
+.benefits__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.benefit {
+  padding: 14px 16px;
+  background: var(--surface-sunken);
+  border-radius: var(--r-md);
+}
+
+.benefit__title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.benefit__text {
+  font-size: 0.875rem;
+  color: var(--ink-mute);
+}
+
+/* --- Pied de page -------------------------------------------------------- */
+
+.foot {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.foot__line {
+  font-size: 0.8125rem;
+  color: var(--ink-mute);
+}
+
+/* --- Écrans plus larges (page de conversion, on ne s'étale pas) ---------- */
+
+@media (min-width: 600px) {
+  .wrap { padding-top: 48px; padding-bottom: 56px; }
+  .hero__title { font-size: 2rem; }
+  .benefits__list {
+    flex-direction: row;
+    gap: 10px;
+  }
+  .benefit { flex: 1 1 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta:active { transform: none; }
+}
+
+/* ── Page document (legal.html) ─────────────────────────────────────
+   Même colonne que la landing. Aucun style inline, aucune ressource
+   externe : la page légale respecte les mêmes invariants que index.html
+   (0 requête sortante, 0 cookie), sinon elle contredirait son contenu. */
+
+.doc {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 24px 20px 56px;
+}
+
+.doc__back {
+  margin: 0 0 20px;
+  font-size: 0.875rem;
+}
+
+.doc__back a {
+  color: var(--accent-deep);
+}
+
+.doc__title {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.doc__date {
+  margin: 0 0 20px;
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+
+.doc__intro {
+  margin: 0 0 28px;
+  padding: 14px 16px;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ink-mute);
+  background: var(--accent-wash);
+  border-radius: var(--r-md);
+}
+
+.doc h2 {
+  margin: 32px 0 10px;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.doc h3 {
+  margin: 20px 0 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.doc p,
+.doc li {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-mute);
+}
+
+.doc p {
+  margin: 0 0 12px;
+}
+
+.doc ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.doc li {
+  margin-bottom: 6px;
+}
+
+.doc strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.doc a {
+  color: var(--accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Adresse citée en texte, volontairement pas cliquable : un lien
+   sortant serait une requête vers un tiers au clic, et la page
+   affirme n'en faire aucune. */
+
+.doc__nolink {
+  color: var(--ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}

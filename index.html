@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glucidix — [PROMESSE — 1 phrase]</title>
+<meta name="description" content="[META DESCRIPTION — 1 phrase, 140 caractères max]">
+<meta property="og:title" content="Glucidix — [PROMESSE — 1 phrase]">
+<meta property="og:description" content="[META DESCRIPTION — 1 phrase, 140 caractères max]">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="wrap">
+
+  <header class="brand">
+    <svg class="brand__mark" viewBox="0 0 100 100" role="img" aria-label="Logo Glucidix">
+      <defs>
+        <clipPath id="gx-drop">
+          <path d="M50,13 C50,13 26,45 26,62 A24,24 0 1 0 74,62 C74,45 50,13 50,13 Z"/>
+        </clipPath>
+      </defs>
+      <path clip-path="url(#gx-drop)"
+            d="M14,58 L30,50 L42,58 L52,48 L64,58 L86,50 L86,94 L14,94 Z"
+            fill="#6F9E6C"/>
+      <path d="M50,13 C50,13 26,45 26,62 A24,24 0 1 0 74,62 C74,45 50,13 50,13 Z"
+            fill="none" stroke="#38503A" stroke-width="7" stroke-linejoin="round"/>
+    </svg>
+    <span class="brand__word">Glucidix</span>
+  </header>
+
+  <section class="hero">
+    <h1 class="hero__title">[PROMESSE — 1 phrase]</h1>
+
+    <form class="signup" id="signup" novalidate>
+
+      <div class="field">
+        <label class="field__label" for="email">Ton email</label>
+        <input class="field__input" type="email" id="email" name="email"
+               required autocomplete="email" inputmode="email"
+               placeholder="[email]">
+      </div>
+
+      <fieldset class="platform">
+        <legend class="platform__legend">Ta plateforme</legend>
+        <div class="segments">
+          <input class="segments__radio" type="radio" id="pf-android" name="platform" value="android" required>
+          <label class="segments__label" for="pf-android">Android</label>
+          <input class="segments__radio" type="radio" id="pf-ios" name="platform" value="ios" required>
+          <label class="segments__label" for="pf-ios">iOS</label>
+        </div>
+      </fieldset>
+
+      <div class="consent">
+        <input class="consent__box" type="checkbox" id="consent" name="consent" required>
+        <label class="consent__label" for="consent"><span>[CONSENTEMENT — texte fourni plus tard] <a href="legal.html">[LIEN LÉGAL]</a></span></label>
+      </div>
+
+      <button class="cta" type="submit">[CTA]</button>
+
+      <p class="formmsg" id="formmsg" role="status" aria-live="polite"></p>
+    </form>
+
+    <div class="confirm" id="confirm" hidden>
+      <p class="confirm__text">[CONFIRMATION]</p>
+    </div>
+  </section>
+
+  <section class="benefits" aria-labelledby="benefits-title">
+    <h2 class="benefits__title" id="benefits-title">[TITRE SECTION BÉNÉFICES]</h2>
+    <ul class="benefits__list">
+      <li class="benefit">
+        <h3 class="benefit__title">[BÉNÉFICE 1]</h3>
+        <p class="benefit__text">[SOUS-TEXTE 1 — 1 ligne]</p>
+      </li>
+      <li class="benefit">
+        <h3 class="benefit__title">[BÉNÉFICE 2]</h3>
+        <p class="benefit__text">[SOUS-TEXTE 2 — 1 ligne]</p>
+      </li>
+      <li class="benefit">
+        <h3 class="benefit__title">[BÉNÉFICE 3]</h3>
+        <p class="benefit__text">[SOUS-TEXTE 3 — 1 ligne]</p>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="foot">
+    <p class="foot__line">Glucidix · <a href="legal.html">Mentions légales</a></p>
+  </footer>
+
+</main>
+
+</body>
+</html>
