@@ -60,11 +60,18 @@
     <h1 class="hero__title">Ton copilote nutrition qui t’évite de te cramer sur les longues sorties</h1>
     <p class="hero__sub">L’app n’est pas encore sortie. Laisse ton email, tu sauras quand elle l’est.</p>
 
-    <form class="signup" id="signup" novalidate>
+    <!-- Postée vers Brevo, mais dans une iframe cachée : un POST classique
+         ferait quitter la page vers leur écran de remerciement. `action` et
+         `target` sont dans le HTML, pas ajoutés en JS, pour que le
+         formulaire reste fonctionnel si le script ne tourne pas. -->
+    <form class="signup" id="signup" novalidate
+          method="POST"
+          target="brevo-sink"
+          action="https://ad6a2c7d.sibforms.com/serve/MUIFAGKUYJ5BR7SblZ0DvxFm457HonthakmXMBGtkZe1nFc2muRaJe-ljU8IlcJGCZlVMDjrRhgxoyEFrT0zbUQuONLgXcnuH5m4raD4hiRo-2mAb8VFRv-J_99k-1-SCJlkB-lLYCVXVuoW8qYg8__DHqq3THJoaSHjOlFhYAsaSARmSg7_aAb0tGUpnGAfqKqjKJoLQKWEuwTa1Q==">
 
       <div class="field">
-        <label class="field__label" for="email">Ton email</label>
-        <input class="field__input" type="email" id="email" name="email"
+        <label class="field__label" for="EMAIL">Ton email</label>
+        <input class="field__input" type="email" id="EMAIL" name="EMAIL"
                required autocomplete="email" inputmode="email"
                placeholder="toi@exemple.fr">
       </div>
@@ -87,11 +94,18 @@
       <button class="cta" type="submit">Préviens-moi au lancement</button>
 
       <p class="formmsg" id="formmsg" role="status" aria-live="polite"></p>
+
+      <!-- Champs attendus par Brevo. PLATEFORME est rempli au moment de
+           l'envoi depuis le choix Android / iOS ; email_address_check est
+           leur piège à robots et doit partir vide. -->
+      <input type="hidden" id="PLATEFORME" name="PLATEFORME" value="">
+      <input type="text" name="email_address_check" value="" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px">
+      <input type="hidden" name="locale" value="fr">
     </form>
 
     <div class="confirm" id="confirm" hidden>
-      <p class="confirm__text">C’est noté.</p>
-      <p class="confirm__note">Maquette : rien n’a été envoyé, ton email n’est enregistré nulle part.</p>
+      <p class="confirm__text">Presque : ouvre ta boîte mail.</p>
+      <p class="confirm__note">Un email de confirmation vient de partir. Tant que tu n’as pas cliqué le lien qu’il contient, tu n’es pas inscrit. Pense à regarder dans les spams.</p>
     </div>
   </section>
 
@@ -109,7 +123,6 @@
 <footer class="foot">
   <div class="foot__inner">
     <p>Glucidix · <button class="foot__toggle" id="legal-toggle" type="button" aria-expanded="false" aria-controls="legal">Mentions légales</button></p>
-    <p class="foot__mock">Maquette de présentation — le formulaire n’enregistre rien.</p>
 
     <!-- Volume réduit au strict nécessaire. Les items conservés sont ceux
          qu'une collecte d'email au consentement impose : identité + contact,
@@ -132,6 +145,9 @@
 </footer>
 
 </div><!-- /.page -->
+
+<!-- Absorbe la réponse de Brevo pour que la page ne bouge pas. -->
+<iframe name="brevo-sink" title="" tabindex="-1" aria-hidden="true" style="display:none"></iframe>
 
 <script>
 /* ---- Fond généré ---------------------------------------------------------
@@ -228,7 +244,7 @@ function ring(cx, cy, r, phase, k) {
   });
 })();
 
-/* ---- Formulaire (maquette : rien n'est envoyé) --------------------------- */
+/* ---- Formulaire --------------------------------------------------------- */
 
 const form = document.getElementById('signup');
 const msg = document.getElementById('formmsg');
@@ -243,30 +259,46 @@ function refuse(message, field) {
 }
 
 form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const emailField = document.getElementById('email');
+  const emailField = document.getElementById('EMAIL');
   const consentBox = document.getElementById('consent');
   const email = emailField.value.trim();
   const platform = form.querySelector('input[name="platform"]:checked');
 
   form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
 
+  // Un champ manquant : on bloque l'envoi et on pointe le fautif.
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    e.preventDefault();
     refuse('Il manque une adresse email valide.', emailField);
     return;
   }
   if (!platform) {
+    e.preventDefault();
     refuse('Choisis Android ou iOS.', document.getElementById('pf-android'));
     return;
   }
   if (!consentBox.checked) {
+    e.preventDefault();
     refuse('Coche la case pour qu’on puisse t’écrire.', consentBox);
     return;
   }
 
+  // Valide : on laisse partir la soumission native vers l'iframe.
+  document.getElementById('PLATEFORME').value =
+    platform.value === 'ios' ? 'iOS' : 'Android';
+
+  // Ces deux-là ne servent qu'ici : Brevo n'attend pas de champs `platform`
+  // ni `consent`. Désactivés, ils ne sont pas sérialisés.
+  form.querySelectorAll('input[name="platform"]').forEach((el) => { el.disabled = true; });
+  consentBox.disabled = true;
+
   msg.textContent = '';
   form.hidden = true;
   document.getElementById('confirm').hidden = false;
+
+  // On ne peut pas lire la réponse de Brevo (pas de CORS sur sibforms.com),
+  // d'où une confirmation optimiste. C'est sans risque ici : la vraie
+  // confirmation, c'est le lien reçu par email — et le message le dit.
 });
 
 /* ---- Mentions légales dépliables ---------------------------------------- */

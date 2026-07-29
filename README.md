@@ -27,15 +27,25 @@ mais `file://` fausse le rendu de la police.
 Le fond (carte topographique + profil D+ avec les prises) est **généré en
 code** : aucune image, aucun tracé SVG écrit à la main.
 
+## Brevo
+
+Le formulaire poste vers l'endpoint Brevo de la liste `waiting list`, en
+double opt-in. Champs envoyés : `EMAIL`, `PLATEFORME` (`Android` / `iOS`),
+`email_address_check` (piège à robots, doit rester vide), `locale`.
+
+La soumission vise une **iframe cachée** : un POST classique ferait quitter
+la page vers l'écran de remerciement de Brevo. Conséquence assumée — la
+réponse n'est pas lisible (pas de CORS sur `sibforms.com`), donc la
+confirmation est optimiste. Sans risque : la vraie confirmation est le lien
+reçu par email, et le message à l'écran le dit.
+
+Les champs `platform` et `consent` sont désactivés juste avant l'envoi :
+ils ne servent qu'au navigateur, Brevo ne les attend pas.
+
+**Jamais de clé API ici** : le repo est public et la page est statique. Si
+le formulaire Brevo est recréé, seule l'URL d'`action` change.
+
 ## Reste à faire
 
-- **Branchement Brevo.** Le formulaire valide les champs et affiche `#confirm`,
-  mais n'envoie rien. Il faut l'`action` du formulaire Brevo et les `name` des
-  champs (`EMAIL`, attribut `PLATEFORME`). Jamais de clé API ici : le repo est
-  public et la page est statique.
-- **Retirer les deux mentions « maquette »** (ligne de pied + note dans
-  `#confirm`) au moment du branchement — pas avant, sinon la page prétend
-  enregistrer un email qu'elle jette.
-- **Wording de confirmation** à passer en double opt-in : « ouvre ta boîte
-  mail et clique le lien », pas « tu es inscrit ».
 - Mettre à jour `og:url` / `og:image` si le repo est renommé.
+- Incrémenter `style.css?v=` à chaque modification de la feuille.
