@@ -69,11 +69,15 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   min-height: 100dvh;
 }
 
-/* Contenu ancré en haut, pas centré : centré verticalement, il descend dans
-   la bande du profil et le tracé repasse sur le formulaire. */
+/* Colonne : contenu en haut, profil poussé en bas par `margin-top: auto`.
+   Quand la fenêtre est haute, le tracé descend se caler au-dessus du pied ;
+   quand elle est courte, il suit simplement le formulaire et la page
+   scrolle un peu. */
 .stage {
   position: relative;
   flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Ancré à la scène, pas au viewport : en `fixed`, le profil reste collé au
@@ -124,16 +128,16 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
 /* Le tracé est étiré en largeur (preserveAspectRatio="none"). Tout <text>
    placé dedans subirait la même déformation et sortirait aplati : les prises
    sont donc du HTML positionné en %, au-dessus du SVG.
-   Le fondu est un MASQUE sur le dessin, pas un voile posé par-dessus — un
-   aplat effacerait le carroyage sur son emprise et créerait une démarcation
-   horizontale nette entre la carte et le profil.
-   `dvh` et pas `vh` : sur mobile, `vh` vaut la hauteur SANS la barre d'URL,
-   donc le profil remontait dans le formulaire tant que la barre est là. */
+   Hauteur en px et non en dvh : la bande doit rester un bandeau graphique
+   de taille prévisible, pas une fraction de fenêtre qui écrase le dessin sur
+   un écran court. */
 .plot {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  height: 30dvh;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,.3) 30%, #000 62%);
-  mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,.3) 30%, #000 62%);
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  width: 100%;
+  height: 180px;
+  flex: 0 0 auto;
 }
 .plot svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .plot .pins { position: absolute; inset: 0; }
@@ -147,7 +151,7 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   stroke-dasharray: var(--len);
   stroke-dashoffset: var(--len);
   animation: draw 4.2s cubic-bezier(.5,.1,.2,1) forwards;
-  opacity: .72;
+  opacity: .85;
 }
 .plot .area { opacity: 0; animation: fadein 2.4s ease 1.4s forwards; }
 
@@ -418,7 +422,7 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   .hero__title { font-size: 2rem; line-height: 1.2; margin-bottom: 10px; }
   .hero__sub { font-size: 0.9375rem; margin-bottom: 26px; }
   .signup { gap: 14px; }
-  .plot { height: 42dvh; }
+  .plot { height: 260px; }
 }
 
 /* Téléphone en paysage : de la largeur, presque pas de hauteur. Tout se
@@ -434,7 +438,7 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   .signup { gap: 10px; }
   .field__label, .platform__legend { margin-bottom: 4px; }
   .cta { font-size: 1.0625rem; padding: 11px 18px; }
-  .plot { height: 26dvh; }
+  .plot { height: 120px; }
   .foot__inner { padding: 12px 20px 16px; }
 }
 

@@ -22,7 +22,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <!-- ?v= à incrémenter à chaque modif de la feuille : GitHub Pages sert la
      CSS avec un cache long, sans ça un visiteur déjà venu garde l'ancienne. -->
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 
@@ -35,10 +35,6 @@
     <svg id="iso" viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice"></svg>
     <div class="grain"></div>
     <div class="clear"></div>
-  </div>
-  <div class="plot">
-    <svg id="profil" viewBox="0 0 1200 420" preserveAspectRatio="none"></svg>
-    <div class="pins" id="pins"></div>
   </div>
 </div>
 
@@ -100,6 +96,13 @@
   </section>
 
 </main>
+
+<!-- Le profil vit dans le flux, sous le formulaire : en fond, ses pics
+     passaient derrière la colonne et le bouton les masquait. -->
+<div class="plot" aria-hidden="true">
+  <svg id="profil" viewBox="0 0 1200 420" preserveAspectRatio="none"></svg>
+  <div class="pins" id="pins"></div>
+</div>
 
 </div><!-- /.stage -->
 
