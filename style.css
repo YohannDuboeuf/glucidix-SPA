@@ -344,9 +344,20 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
 /* Le survol n'existe qu'au pointeur. Sans ce garde-fou, un tap sur mobile
    laisse le bouton bloqué en vert foncé jusqu'au tap suivant. */
 @media (hover: hover) {
-  .cta:hover { background: var(--accent-deep); }
+  .cta:not([aria-disabled="true"]):hover { background: var(--accent-deep); }
 }
-.cta:active { transform: translateY(1px); }
+.cta:not([aria-disabled="true"]):active { transform: translateY(1px); }
+
+/* Grisé tant que la case n'est pas cochée. `aria-disabled` et non l'attribut
+   `disabled` : le bouton reste atteignable au clavier et cliquable, donc un
+   clic peut encore dire ce qui manque. Un vrai `disabled` sort le bouton de
+   l'ordre de tabulation et laisse le visiteur sans réponse. */
+.cta[aria-disabled="true"] {
+  background: #E9EBE7;
+  color: var(--ink-mute);
+  box-shadow: none;
+  cursor: not-allowed;
+}
 
 /* Le champ fautif se signale aussi visuellement : le message seul, posé
    sous le bouton, se lit mal quand l'erreur porte sur la case à cocher. */

@@ -22,7 +22,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <!-- ?v= à incrémenter à chaque modif de la feuille : GitHub Pages sert la
      CSS avec un cache long, sans ça un visiteur déjà venu garde l'ancienne. -->
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -91,7 +91,7 @@
         <label class="consent__label" for="consent"><span>J’accepte de recevoir par email l’avancement et la sortie de Glucidix. Pas de publicité, désinscription en un clic.</span></label>
       </div>
 
-      <button class="cta" type="submit">Préviens-moi au lancement</button>
+      <button class="cta" type="submit" aria-disabled="true">Préviens-moi au lancement</button>
 
       <p class="formmsg" id="formmsg" role="status" aria-live="polite"></p>
 
@@ -248,6 +248,18 @@ function ring(cx, cy, r, phase, k) {
 
 const form = document.getElementById('signup');
 const msg = document.getElementById('formmsg');
+
+/* Le bouton s'allume quand la case est cochée. Il reste cliquable même
+   éteint : la validation dira alors ce qui manque. */
+const cta = form.querySelector('.cta');
+const consentToggle = document.getElementById('consent');
+
+function syncCta() {
+  cta.setAttribute('aria-disabled', String(!consentToggle.checked));
+}
+
+consentToggle.addEventListener('change', syncCta);
+syncCta();
 
 /* Le bouton reste actif même quand le formulaire est incomplet. Un bouton
    grisé ne dit pas CE QUI manque : le visiteur cherche, ou part. On laisse
