@@ -170,7 +170,7 @@ a { color: var(--accent-deep); text-underline-offset: 2px; }
   animation: halo 2.8s ease-out infinite;
 }
 .pin .lab {
-  position: absolute; left: 50%; bottom: 15px;
+  position: absolute; left: 50%; bottom: 22px;
   transform: translateX(-50%);
   font: 700 11px/1 var(--font);
   color: var(--ink-mute);
