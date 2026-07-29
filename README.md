@@ -5,7 +5,7 @@ HTML/CSS/JS vanilla — aucun build, aucune dépendance, aucune requête réseau
 sortante au chargement. Police Plus Jakarta Sans variable servie en local
 depuis `fonts/`.
 
-Publiée sur GitHub Pages : <https://yohannduboeuf.github.io/glucidix-spa/>
+Publiée sur GitHub Pages : <https://yohannduboeuf.github.io/glucidix-SPA/>
 
 ## Ouvrir en local
 
