@@ -249,15 +249,26 @@ function ring(cx, cy, r, phase, k) {
 const form = document.getElementById('signup');
 const msg = document.getElementById('formmsg');
 
-/* Le bouton s'allume quand la case est cochée. Il reste cliquable même
-   éteint : la validation dira alors ce qui manque. */
+const EMAIL_OK = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+/* Le bouton s'allume quand le formulaire est complet : email valide,
+   plateforme choisie, case cochée. Il reste cliquable même éteint — la
+   validation dira alors lequel des trois manque. */
 const cta = form.querySelector('.cta');
 const consentToggle = document.getElementById('consent');
 
-function syncCta() {
-  cta.setAttribute('aria-disabled', String(!consentToggle.checked));
+function formReady() {
+  return EMAIL_OK.test(document.getElementById('EMAIL').value.trim())
+    && !!form.querySelector('input[name="platform"]:checked')
+    && consentToggle.checked;
 }
 
+function syncCta() {
+  cta.setAttribute('aria-disabled', String(!formReady()));
+}
+
+document.getElementById('EMAIL').addEventListener('input', syncCta);
+form.querySelectorAll('input[name="platform"]').forEach((el) => el.addEventListener('change', syncCta));
 consentToggle.addEventListener('change', syncCta);
 syncCta();
 
@@ -279,7 +290,7 @@ form.addEventListener('submit', (e) => {
   form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
 
   // Un champ manquant : on bloque l'envoi et on pointe le fautif.
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+  if (!EMAIL_OK.test(email)) {
     e.preventDefault();
     refuse('Il manque une adresse email valide.', emailField);
     return;
